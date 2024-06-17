@@ -59,7 +59,13 @@ jobs:
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
-          
+
+      - name: Copy Repo Settings
+        uses: RedEyeMods/copy-settings-action@2024.6.2
+        with:
+          token: ${{ secrets.ORG_PAT }}
+          source-repo: ${{ env.SOURCE_REPO }}
+      
       - name: Copy Misc Settings
         uses: actions/github-script@v7
         with:
