@@ -20,6 +20,7 @@ jobs:
           filters: |
             index:
               - 'index.js'
+              - 'action.yml'
               
   release-dist:
     runs-on: ubuntu-latest
