@@ -4,26 +4,16 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   get-template-repo:
     name: Parent Template Repository
     runs-on: ubuntu-latest
     outputs:
-      template_repository: ${{ steps.data-interpreter.outputs.TEMPLATE_REPO_JSON }}
+      template_repository: ${{ steps.org-grab.outputs.result }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Restore Cached Org Data
-        id: cache-repo
-        uses: actions/cache@v4
-        with:
-          path: |
-            org-data.txt
-          key: json-org-data
-
       - name: Get Organization Data
-        if: steps.cache-repo.outputs.cache-hit != 'true'
         id: org-grab
         uses: actions/github-script@v7
         with:
@@ -36,44 +26,19 @@ jobs:
             if (request.status != 200)
               throw new Exception('Bad API response: ' + request.status);
 
-            var dataStringified = JSON.stringify(request.data.template_repository == undefined ? {} : request.data.template_repository);
-            console.log(dataStringified);
-            fs.writeFileSync('org-data.txt', dataStringified);
-
-      - id: data-interpreter
-        run: |
-          echo 'TEMPLATE_REPO_JSON<<EOF' >> $GITHUB_OUTPUT
-          cat org-data.txt >> $GITHUB_OUTPUT
-          echo '\n' >> $GITHUB_OUTPUT
-          echo 'EOF' >> $GITHUB_OUTPUT
-
-  check-diff:
-    needs: get-template-repo
-    if: ${{ fromJson(needs.get-template-repo.outputs.template_repository).full_name != '' }}
-    runs-on: ubuntu-latest
-    outputs:
-      COMPLIANCE_CHANGED: ${{ steps.filter.outputs.compliance }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@v3
-        id: filter
-        with:
-          base: main
-          filters: |
-            compliance:
-              - '.github/workflows/organization-compliance.yml'
+            return request.data.template_repository == undefined ? {} : request.data.template_repository;
 
   run-init:
     name: Repository Settings Synchronization
-    needs: [ 'check-diff', 'get-template-repo' ]
-    if: ${{ needs.check-diff.outputs.COMPLIANCE_CHANGED == 'true' }}
+    needs: get-template-repo
+    if: ${{ fromJson(needs.get-template-repo.outputs.template_repository).full_name != '' }}
     runs-on: ubuntu-latest
     env:
       CUR_REPO: ${{ github.repository }}
       SOURCE_REPO: ${{ fromJson(needs.get-template-repo.outputs.template_repository).full_name }}
     steps:
       - name: Copy On Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.8
+        uses: RedEyeMods/copy-rulesets-action@2024.6.12
         with:
           owner-token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -81,7 +46,7 @@ jobs:
           ruleset-enabled: true
           overwrite: true
       - name: Copy Off Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.8
+        uses: RedEyeMods/copy-rulesets-action@2024.6.12
         with:
           owner-token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -90,7 +55,7 @@ jobs:
           overwrite: true
 
       - name: Copy Labels
-        uses: RedEyeMods/copy-labels-action@2024.6.2
+        uses: RedEyeMods/copy-labels-action@2024.6.4
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -128,3 +93,13 @@ jobs:
               console.error(error);
               process.exit(1);
             });
+    
+  one-time:
+    name: Execute One Time
+    runs-on: ubuntu-latest
+    steps:
+      - name: Disable Workflow
+        run: |
+          gh workflow disable -R $GITHUB_REPOSITORY "${{ github.workflow }}"
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
