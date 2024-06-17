@@ -3,7 +3,8 @@ description: 'Copies the rulesets of one repository onto another.'
 inputs:
   token:
     description: 'The token to use.'
-    require: true
+    require: false
+    default: ${{ github.token }}
   source-repo:
     description: 'The repository to obtain the rulesets from; Ensure the provided secret is able to access this.'
     required: true
