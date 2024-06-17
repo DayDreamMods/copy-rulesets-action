@@ -40,7 +40,7 @@ jobs:
       - name: Copy On Rulesets
         uses: RedEyeMods/copy-rulesets-action@2024.6.12
         with:
-          owner-token: ${{ secrets.ORG_PAT }}
+          token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
           regex-filter: '✓+.*'
           ruleset-enabled: true
@@ -48,7 +48,7 @@ jobs:
       - name: Copy Off Rulesets
         uses: RedEyeMods/copy-rulesets-action@2024.6.12
         with:
-          owner-token: ${{ secrets.ORG_PAT }}
+          token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
           regex-filter: '✗+.*'
           ruleset-enabled: false
