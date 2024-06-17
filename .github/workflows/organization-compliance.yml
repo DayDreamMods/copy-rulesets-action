@@ -73,7 +73,7 @@ jobs:
       SOURCE_REPO: ${{ fromJson(needs.get-template-repo.outputs.template_repository).full_name }}
     steps:
       - name: Copy On Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.10
+        uses: RedEyeMods/copy-rulesets-action@2024.6.11
         with:
           owner-token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -81,7 +81,7 @@ jobs:
           ruleset-enabled: true
           overwrite: true
       - name: Copy Off Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.10
+        uses: RedEyeMods/copy-rulesets-action@2024.6.11
         with:
           owner-token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
