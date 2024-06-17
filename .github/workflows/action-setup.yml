@@ -1,0 +1,73 @@
+name: Setup Javascript Action
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - '**'
+
+jobs:
+  make-pr:
+    name: Create & PR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+      - uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_SIGNING_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+          
+      - uses: 1arp/create-a-file-action@0.4.5
+        with:
+          file: action.yml
+          content: |
+            name: '${{ github.event.repository.name }}'
+            description: "${{ github.event.repository.description }}"
+            inputs:
+              token:
+                description: 'The token to use.'
+                require: false
+                default: ${{ '${{ github.token }}' }}
+            runs:
+              using: 'node20'
+              main: 'index.js'
+              
+      - uses: 1arp/create-a-file-action@0.4.5
+        with:
+          file: index.js
+          content: |
+            const core = require('@actions/core');
+            const github = require('@actions/github');
+            
+            (async() => {
+                const octokit = github.getOctokit(core.getInput('token'));
+                
+            })();
+
+      - run: |
+          npm init -y
+          npm install @actions/core
+          npm install @actions/github
+
+      - name: GitHub PR
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add .
+          git checkout -b added/initial/action-setup
+          git commit -am "Setup basic Javascript action"
+          git push --set-upstream origin added/initial/action-setup
+          gh pr create --base ${{ github.event.repository.default_branch }} --head added/initial/action-setup --title "Setup basic Javascript action" --body "" || echo "PR already exists or another error occurred"
+
+  one-time:
+    name: Execute One Time
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ github.token }}
+    steps:
+      - name: Disable Workflow
+        run: |
+          gh workflow disable -R $GITHUB_REPOSITORY "${{ github.workflow }}"
