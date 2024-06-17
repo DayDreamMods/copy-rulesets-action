@@ -2,7 +2,7 @@ const core = require('@actions/core');
 const github = require('@actions/github');
 
 (async() => {
-    const octokit = github.getOctokit(core.getInput("owner-token"));
+    const octokit = github.getOctokit(core.getInput("token"));
     const sourceRepo = core.getInput("source-repo");
     let destRepo = core.getInput("dest-repo");
     if (destRepo.length == 0) 

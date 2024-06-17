@@ -1,7 +1,7 @@
 name: 'Copy Rulesets'
 description: 'Copies the rulesets of one repository onto another.'
 inputs:
-  owner-token:
+  token:
     description: 'The token to use.'
     require: true
   source-repo:
