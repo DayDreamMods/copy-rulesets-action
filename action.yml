@@ -1,10 +1,32 @@
-name: 'copy-rulesets-action'
-description: "A GitHub action that copies rulesets from one repository to another."
+name: 'Copy Rulesets'
+description: 'Copies the rulesets of one repository onto another.'
 inputs:
-  token:
+  owner-token:
     description: 'The token to use.'
-    require: false
-    default: ${{ github.token }}
+    require: true
+  source-repo:
+    description: 'The repository to obtain the rulesets from; Ensure the provided secret is able to access this.'
+    required: true
+  dest-repo:
+    description: 'The repository to copy the rulesets onto. Defaults to the current repository; Ensure the provided secret is able to access this.'
+    required: false
+    default: ''
+  regex-filter:
+    descripton: 'The RegEx to check against the rulesets name.'
+    required: false
+    default: '.*'
+  name-format:
+    description: 'The format of the new name with an optional ${name} insertion.'
+    required: false
+    default: '${name}'
+  ruleset-enabled:
+    description: "Are the rulesets enabled when they're copied over?"
+    required: false
+    default: false
+  overwrite:
+    description: 'Should we overwrite any existing rulesets or fail silently?'
+    required: false
+    default: false
 runs:
   using: 'node20'
   main: 'index.js'
