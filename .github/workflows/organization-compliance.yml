@@ -38,7 +38,7 @@ jobs:
       SOURCE_REPO: ${{ fromJson(needs.get-template-repo.outputs.template_repository).full_name }}
     steps:
       - name: Copy On Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.12
+        uses: DayDreamMods/copy-rulesets-action@2024.6.12
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -46,7 +46,7 @@ jobs:
           ruleset-enabled: true
           overwrite: true
       - name: Copy Off Rulesets
-        uses: RedEyeMods/copy-rulesets-action@2024.6.12
+        uses: DayDreamMods/copy-rulesets-action@2024.6.12
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
@@ -55,13 +55,13 @@ jobs:
           overwrite: true
 
       - name: Copy Labels
-        uses: RedEyeMods/copy-labels-action@2024.6.4
+        uses: DayDreamMods/copy-labels-action@2024.6.4
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}
 
       - name: Copy Repo Settings
-        uses: RedEyeMods/copy-settings-action@2024.6.6
+        uses: DayDreamMods/copy-settings-action@2024.6.6
         with:
           token: ${{ secrets.ORG_PAT }}
           source-repo: ${{ env.SOURCE_REPO }}

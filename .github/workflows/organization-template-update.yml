@@ -73,7 +73,7 @@ jobs:
           git merge -X theirs --allow-unrelated-histories ${{ env.REMOTE_FULLNAME }}/${{ env.REMOTE_DEFAULT_BRANCH}}
 
           echo 'GIT_DIFF<<EOF' >> $GITHUB_OUTPUT
-          git diff ${{ env.PR_BRANCH }} ${{ env.REMOTE_FULLNAME }}/${{ env.REMOTE_DEFAULT_BRANCH}} >> $GITHUB_OUTPUT
+          git diff ${{ env.PR_BRANCH }} ${{ matrix.target-repo.default_branch }} >> $GITHUB_OUTPUT
           echo 'EOF' >> $GITHUB_OUTPUT
           
       - name: Create PR
